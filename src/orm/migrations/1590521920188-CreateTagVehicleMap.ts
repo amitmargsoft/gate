@@ -21,7 +21,7 @@ export class CreateTagVehicle1590521920166 implements MigrationInterface {
         vehicle_verification_status varchar NULL,
         vehicle_enabled_flag varchar NULL,
         tag_details varchar NULL,
-        inserted_at timestamp NULL,
+        inserted_at bigint  NULL,
         inserted_by varchar NULL,
        created_at TIMESTAMP NOT NULL DEFAULT now(), 
        updated_at TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT 

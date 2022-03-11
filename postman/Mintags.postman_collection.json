@@ -1,0 +1,163 @@
+{
+	"info": {
+		"_postman_id": "01f3fbd1-9b1c-4e4e-aed5-dba94147a4d5",
+		"name": "Mintags",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "DEV: 127.0.0.1",
+			"item": [
+				{
+					"name": "RFID",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n    \"EPC96\": \"E20011810000000000025904\",\n    \"antennaID\": 1,\n    \"tagSeenCount\": 1,\n    \"peakRSSI\": -68,\n    \"roSpecID\": 1,\n    \"specIndex\": 1,\n    \"inventoryParameterSpecID\": 123,\n    \"channelIndex\": 3,\n    \"C1G2PC\": 13312,\n    \"C1G2CRC\": 55842,\n    \"accessSpecID\": 0,\n    \"firstSeenTimestampUTC\": 1645423207791389,\n    \"lastSeenTimestampUTC\": 1645423207791389,\n    \"custom\": \"0000651A000000370006E280110520007596D2890A9B\",\n    \"TID\": \"E280110520007596D2890A9B\",\n    \"tag_number\": \"E280110520007596D2890A9B\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:4001/tags/get-tid",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "4001",
+							"path": [
+								"tags",
+								"get-tid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RTO-PLATE-PRIFIX",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic YzJiX2Zyb250ZW5kOko1SXRmQTk2bTJfY3lRVk00dEtOSnBYaFJ0c0NtY1h1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "https://www.cars24.com/svc/rto?cms_uri=uttar-pradesh",
+							"protocol": "https",
+							"host": [
+								"www",
+								"cars24",
+								"com"
+							],
+							"path": [
+								"svc",
+								"rto"
+							],
+							"query": [
+								{
+									"key": "cms_uri",
+									"value": "uttar-pradesh"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ANPR",
+			"item": [
+				{
+					"name": "115.243.39.106",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"custom\": {\n        \"startTimestamp\": \"1646396354628\",\n        \"camera_startTimestamp\": 1646396354628.7002,\n        \"variance\": 21,\n        \"camera_endTimestamp\": 1646396354628.104,\n        \"event_type\": \"vehicle\",\n        \"startx\": 349,\n        \"endTimestamp\": \"1646396354628\",\n        \"endx\": 258,\n        \"endy\": 652,\n        \"starty\": 65,\n        \"event_attribute\": \"normal\",\n        \"event_message\": \"normal\"\n    },\n    \"event\": {\n        \"external_camera_id\": \"Entry-Cam\",\n        \"groupId\":455,\n        \"coordinates\": {\n            \"ymin\": 156,\n            \"xmin\": 340,\n            \"width\": 160,\n            \"height\": 40\n        },\n        \"name\": \"UP32MJ6503\",\n        \"db_match\": false,\n        \"properties\": {\n            \"path\": [\n                \"1\",\n                \"2\"\n            ],\n            \"video\": \"http://127.0.0.1:8201/fffffffff/report/2022/03/04/videoClips/aux/aux_38167_KA01AB10_8693.mp4\"\n        },\n        \"direction\": \"Entry\",\n        \"aux_lp\": [],\n        \"reading\": \"UP32MJ6503\",\n        \"tags\": [\n            [\n                null\n            ],\n            [\n                null\n            ],\n            [\n                null\n            ],\n            [\n                null\n            ],\n            [\n                null\n            ],\n            [\n                null\n            ],\n            [\n                null\n            ]\n        ],\n        \"match_type\": \"LP\",\n        \"priority\": 1,\n        \"vehicle_category\": {\n            \"ymin\": 0,\n            \"width\": 618,\n            \"height\": 259,\n            \"confidence\": 86,\n            \"xmin\": 115,\n            \"type\": \"TRUCK\"\n        },\n        \"groupId\": \"386698_1646305502416\",\n        \"signature_match\": false,\n        \"custom_id\": \"1456734\",\n        \"confidence\": 86,\n        \"wait_time\": 948,\n        \"main_reading\": \"UP32MJ6503\",\n        \"matched_lp\": null,\n        \"det_confidence\": 98\n    },\n    \"auxInfo\": {\n        \"images\": [\n            [\n                \"http://127.0.0.1:8201/fffffffff/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_0.jpg\",\n        \"http://127.0.0.1:8201/fffffffff/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_1.jpg\",\n        \"http://127.0.0.1:8201/fffffffff/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_2.jpg\",\n        \"http://127.0.0.1:8201/fffffffff/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_3.jpg\"\n            ]\n        ],\n        \"videos\": [\n            [\n                 \"http://127.0.0.1:8201/fffffffff/report/2022/03/04/videoClips/aux/aux_38167_KA01AB10_8693.mp4\"\n            ]\n        ]\n    },\n    \"custom_info\": null,\n    \"info\": {\n        \"event_timestamp\": \"1646396354628\",\n        \"skip_dashboard\": true\n    },\n    \"id\": \"fjid2qy4l0avsh40\",\n    \"image_urls\": {\n        \"cloud_images\": [\n            \"https://127.0.0.1/%20Vision%20-%20Test/Full%20Stack/2022-03-03/1629991074831-SinkDefault/fullimage_46_KA01AB10_3.jpg\",\n            \"https://127.0.0.1%20Vision%20-%20Test/Full%20Stack/2022-03-03/1629991074831-SinkDefault/46_KA01AB10_3.jpg\"\n        ],\n        \"local_images\": []\n    },\n    \"extras\": {\n        \"lane\": \"anprLane2\"\n    },\n    \"base64_images\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:4001/api/v1/anpr/get-anpr-data",
+							"protocol": "http",
+							"host": [
+								"127.0.0.1"
+							],
+							"port": "4001",
+							"path": [
+								"api",
+								"v1",
+								"anpr",
+								"get-anpr-data"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "RFID",
+			"item": [
+				{
+					"name": "115.243.39.106",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n    \"EPC96\": \"E20011810000000000025904\",\n    \"antennaID\": 1,\n    \"tagSeenCount\": 1,\n    \"peakRSSI\": -68,\n    \"roSpecID\": 1,\n    \"specIndex\": 1,\n    \"inventoryParameterSpecID\": 123,\n    \"channelIndex\": 3,\n    \"C1G2PC\": 13312,\n    \"C1G2CRC\": 55842,\n    \"accessSpecID\": 0,\n    \"firstSeenTimestampUTC\": 1645423207791389,\n    \"lastSeenTimestampUTC\": 1645423207791389,\n    \"custom\": \"0000651A000000370006E280110520007596D2890A9B\",\n    \"TID\": \"E280110520007596D2890A9B\",\n    \"tag_number\": \"E280110520007596D2890A9B\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:4001/api/v1/tags/get-tid",
+							"protocol": "http",
+							"host": [
+								"127.0.0.1"
+							],
+							"port": "4001",
+							"path": [
+								"api",
+								"v1",
+								"tags",
+								"get-tid"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

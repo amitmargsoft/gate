@@ -10,7 +10,7 @@ export class CreateAnprsRawStore1590521920166 implements MigrationInterface {
         vehicle_no varchar NULL,
         vehicle_type varchar NULL,
         anpr_timestamp varchar NULL,
-        inserted_at varchar NULL,
+        inserted_at bigint NULL,
         created_at TIMESTAMP NOT NULL DEFAULT now(), 
         updated_at TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT 
         PK_a3ffb1c0c8416b9fc6f907b783 PRIMARY KEY ("seq_no"))`,

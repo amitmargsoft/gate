@@ -7,6 +7,7 @@ export class CreateAnprsDataStore1590521920166 implements MigrationInterface {
     await queryRunner.query(
       `CREATE TABLE "gate_anpr_data_store" (
        "seq_no" SERIAL4 NOT NULL, 
+       "anpr_id" SERIAL4 NOT NULL, 
         device_id varchar NULL,
         event_timestamp varchar NULL,
         match_type varchar NULL,
@@ -22,7 +23,7 @@ export class CreateAnprsDataStore1590521920166 implements MigrationInterface {
         vf_image_path varchar NULL,
         vf_video_path varchar NULL,
         db_match bool NULL,
-         inserted_at timestamp NULL,
+         inserted_at bigint  NULL,
         "created_at" TIMESTAMP NOT NULL DEFAULT now(), 
         "updated_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT 
         "PK_a3ffb1c0c8416b9fc6f907b7434" PRIMARY KEY ("seq_no"))`,

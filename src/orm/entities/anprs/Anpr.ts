@@ -1,9 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import moment from 'moment-timezone';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, PrimaryColumn } from 'typeorm';
 
 @Entity('gate_anpr_data_store')
 export class Anpr {
   @PrimaryGeneratedColumn()
   seq_no: number;
+
+  @Column({
+    nullable: true,
+  })
+  anpr_id: string;
 
   @Column({
     nullable: true,
@@ -75,11 +81,13 @@ export class Anpr {
   })
   db_match: string;
 
-  @Column()
-  @CreateDateColumn()
-  created_at: Date;
+  @Column({
+    nullable: true,
+  })
+  event_timestamp: string;
 
-  @Column()
-  @UpdateDateColumn()
-  updated_at: Date;
+  @Column({
+    nullable: true,
+  })
+  inserted_at: number;
 }
