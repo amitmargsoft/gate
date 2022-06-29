@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { getRepository } from 'typeorm';
 
-//import { Anpr } from 'orm/entities/anprs/Anpr';
+import { Anpr } from 'orm/entities/anprs/Anpr';
 import { Filter } from 'utils/filter';
 import { RedisDB } from 'utils/redisDB';
 import { CustomError } from 'utils/response/custom-error/CustomError';
