@@ -3,90 +3,89 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity('gate_anpr_data_store')
 export class Anpr {
   @PrimaryGeneratedColumn()
-  seq_no: any;
+  seq_no: string;
+  @Column({
+    nullable: true,
+  })
+  anpr_id: string;
 
   @Column({
     nullable: true,
   })
-  anpr_id: any;
+  device_id: string;
 
   @Column({
     nullable: true,
   })
-  device_id: any;
+  match_type: string;
 
   @Column({
     nullable: true,
   })
-  match_type: any;
+  direction: string;
 
   @Column({
     nullable: true,
   })
-  direction: any;
+  priority: string;
 
   @Column({
     nullable: true,
   })
-  priority: any;
+  wait_time: string;
 
   @Column({
     nullable: true,
   })
-  wait_time: any;
+  make: string;
 
   @Column({
     nullable: true,
   })
-  make: any;
+  aux_lp: string;
 
   @Column({
     nullable: true,
   })
-  aux_lp: any;
+  det_confidence: string;
 
   @Column({
     nullable: true,
   })
-  det_confidence: any;
+  confidence: string;
 
   @Column({
     nullable: true,
   })
-  confidence: any;
+  anpr_video_path: string;
 
   @Column({
     nullable: true,
   })
-  anpr_video_path: any;
+  anpr_image_path: string;
 
   @Column({
     nullable: true,
   })
-  anpr_image_path: any;
+  vf_image_path: string;
 
   @Column({
     nullable: true,
   })
-  vf_image_path: any;
+  vf_video_path: string;
 
   @Column({
     nullable: true,
   })
-  vf_video_path: any;
+  db_match: string;
 
   @Column({
     nullable: true,
   })
-  db_match: any;
+  event_timestamp: string;
 
   @Column({
     nullable: true,
   })
-  event_timestamp: any;
-
-  @Column({
-    nullable: true,
-  })
-  inserted_at: any;
+  inserted_at: number;
 }

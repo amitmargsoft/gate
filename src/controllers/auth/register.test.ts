@@ -6,7 +6,7 @@ import { getRepository, Connection, Repository } from 'typeorm';
 import { dbCreateConnection } from 'orm/dbCreateConnection';
 import { User } from 'orm/entities/users/User';
 
-import { app } from '../../';
+import { app } from '../..';
 
 describe('Register', () => {
   let dbConnection: Connection;

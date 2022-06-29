@@ -40,7 +40,7 @@
     "redis": "^4.0.4",
     "reflect-metadata": "^0.1.13",
     "request": "^2.88.2",
-    "typeorm": "^0.2.45",
+    "typeorm": "^0.2.41",
     "typeorm-naming-strategies": "^3.0.0",
     "validator": "^13.7.0"
   },
@@ -61,7 +61,7 @@
     "@typescript-eslint/eslint-plugin": "^5.13.0",
     "@typescript-eslint/parser": "^5.13.0",
     "chai": "^4.3.6",
-    "commitizen": "^4.2.4",
+    "commitizen": "^1.0.4",
     "dotenv": "^16.0.0",
     "eslint": "^8.10.0",
     "eslint-config-prettier": "^8.5.0",

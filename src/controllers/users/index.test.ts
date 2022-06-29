@@ -7,7 +7,7 @@ import { dbCreateConnection } from 'orm/dbCreateConnection';
 import { Role } from 'orm/entities/users/types';
 import { User } from 'orm/entities/users/User';
 
-import { app } from '../../';
+import { app } from '../..';
 
 describe('Users', () => {
   let dbConnection: Connection;

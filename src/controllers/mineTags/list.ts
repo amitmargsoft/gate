@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { getRepository } from 'typeorm';
-
 import { Anpr } from 'orm/entities/anprs/Anpr';
 import { CustomError } from 'utils/response/custom-error/CustomError';
 

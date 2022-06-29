@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
-import mineTags from './mineTags';
 import anprs from './anprs';
 import auth from './auth';
+import mineTags from './mineTags';
 import users from './users';
 
 const router = Router();

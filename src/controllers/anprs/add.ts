@@ -30,8 +30,8 @@ export const add = async (req: Request, res: Response, next: NextFunction) => {
       anpr_image_path: body.event.properties.path.map((value) => process.env.SERVER_ANPR_URL + value),
       db_match: body.event.db_match,
       inserted_at: TodayDateTime(),
-      vf_image_path: [],
-      vf_video_path: [],
+      vf_image_path: '',
+      vf_video_path: '',
       mine_tags: '',
       other_tags: '',
     };
@@ -40,14 +40,14 @@ export const add = async (req: Request, res: Response, next: NextFunction) => {
     let vf_img = [];
     if (body.auxInfo && body.auxInfo.images) vf_img = await body.auxInfo.images.map((value) => value.samples);
 
-    //data.vf_image_path = [].concat.apply([], vf_img).map((value) => process.env.SERVER_ANPR_URL + value);
-    data.vf_image_path = [].map((value) => process.env.SERVER_ANPR_URL + value);
+    data.vf_image_path = [].concat.apply([], vf_img).map((value) => process.env.SERVER_ANPR_URL + value);
+    //data.vf_image_path = JSON.parse([].map((value) => process.env.SERVER_ANPR_URL + value));
 
     let vf_vid = [];
     if (body.auxInfo && body.auxInfo.videos) vf_vid = await body.auxInfo.videos.map((value) => value.path);
 
-    //data.vf_video_path = [].concat.apply([], vf_vid).map((value) => process.env.SERVER_ANPR_URL + value);
-    data.vf_video_path = [].map((value) => process.env.SERVER_ANPR_URL + value);
+    data.vf_video_path = [].concat.apply([], vf_vid).map((value) => process.env.SERVER_ANPR_URL + value);
+    //data.vf_video_path = JSON.parse([].map((value) => process.env.SERVER_ANPR_URL + value));
 
     /* Delay for N seconds */
     // console.log('Step-2>',' Filter tag in stored data in redis');

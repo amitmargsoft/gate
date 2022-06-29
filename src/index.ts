@@ -36,7 +36,6 @@ app.use(morgan('combined'));
 
 app.use('/', routes);
 
-
 new QueueManagement(app);
 
 app.use(errorHandler);
