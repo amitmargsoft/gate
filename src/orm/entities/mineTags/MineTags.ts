@@ -1,4 +1,3 @@
-import moment from 'moment-timezone';
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('gate_rfid_data_store')
@@ -24,9 +23,8 @@ export class MineTags {
   @Column({
     nullable: true,
   })
-  timestamp: number;  
-  
-  
+  timestamp: number;
+
   @Column({
     nullable: true,
   })

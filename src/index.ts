@@ -10,6 +10,9 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import './utils/response/customSuccess';
+
+import { QueueManagement } from 'queueManagement';
+
 import { errorHandler } from './middleware/errorHandler';
 import { dbCreateConnection } from './orm/dbCreateConnection';
 import routes from './routes';
@@ -28,12 +31,15 @@ try {
 } catch (err) {
   console.log(err);
 }
+
 app.use(morgan('combined'));
 
 app.use('/', routes);
 
-app.use(errorHandler);
 
+new QueueManagement(app);
+
+app.use(errorHandler);
 const port = process.env.PORT || 4000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

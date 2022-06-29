@@ -7,7 +7,7 @@ const randomNum = require('utils/random');
 const redisDB = new RedisDB();
 
 export class Filter {
-  public mineral: any;
+  public mineral;
   constructor() {
     this.mineral = new MineralDetect();
     this.mineral.processData();
@@ -18,41 +18,46 @@ export class Filter {
       const rand = await randomNum.getCaseId();
 
       const case_id = process.env.GATE_ID.substring(0, 4) + data.gate_no + rand;
-
+      console.log('Step-4.1>', ' Generate case id');
       const redisKey1 = `AllMineTags`;
       const redisKey2 = `AllOtherTags`;
 
+      const redisRfidStat: any = await redisDB.getAllRedisTag(redisKey1, redisKey2, case_id, data.event_timestamp);
+      console.log('Step-4.2>', ' Filter rf tags');
 
+      console.log('log all tags ', redisRfidStat);
 
-      // const redisRfidStat = await redisDB.getAllRedisTag(redisKey1, redisKey2, case_id, data.event_timestamp);
+      const tag = { mine_tags: [], other_tags: [], tag_number: '', vehicle_no: '' };
 
-      // console.log('ALL TAGS ARE HERE ', redisRfidStat);
+      console.log('Filter Mine tag by amit', redisRfidStat);
+      if (redisRfidStat.status) {
+        tag.mine_tags = redisRfidStat.tag_number;
+        tag.other_tags = redisRfidStat.other_tags;
+        console.log('Step-4.3>', ' Set match tags');
+      }
 
-      // const tag = { mine_tags: '', other_tags: '', tag_number: '', vehicle_no: '' };
+      let isTagRead = 'N';
 
-      // if (redisRfidStat.status) {
-      //   tag.mine_tags = redisRfidStat.tag_number;
-      //   tag.other_tags = redisRfidStat.other_tags;
-      // }
+      if (tag.mine_tags) isTagRead = 'Y';
 
+      if (tag.other_tags) isTagRead = 'Y';
 
-
-      //console.log('**** TAG NUMBER ****', tag);
+      console.log('**** TAG NUMBER ****', tag);
 
       const filterData = {
-        case_id: data.case_id,
+        case_id: case_id,
         gate_id: data.gate_id,
         timestamp: data.event_timestamp,
-        // tag_read_flag: tag.tag_number ? 'Y' : 'N',
-        // tag_number: tag.mine_tags ? tag.mine_tags : '',
-        // other_tag: tag.other_tags ? tag.other_tags : '',
+        tag_read_flag: isTagRead,
+        tag_number: tag.mine_tags ? tag.mine_tags : '',
+        other_tag: tag.other_tags ? tag.other_tags : '',
         vehicle_read_flag: 'Y',
         vehicle_no: data.reading,
         vehicle_type_read_flag: 'Y',
         vehicle_type: data.type,
         vehicle_height_ft: null,
-        // anpr_image_path: data.anpr_image_path,
-        // anpr_video_path: data.anpr_video_path,
+        anpr_image_path: data.anpr_image_path,
+        anpr_video_path: data.anpr_video_path,
         mineral_type: null,
         loaded: null,
         height: null,
@@ -61,15 +66,16 @@ export class Filter {
         create_by: process.env.GATE_ID,
         update_date: new Date(),
         update_by: process.env.GATE_ID,
-        // vf_image_path: [],
-        // vf_video_path: [],
+        vf_image_path: data.vf_image_path,
+        vf_video_path: data.vf_video_path,
       };
+      console.log('Step-4.4>', ' Prepare again data with tags ');
 
       // if (tag.vehicle_no != 'null' || tag.vehicle_no != null) {
       //   tag.vehicle_no = 'null';
       // }
 
-      let vf_img = [];
+      const vf_img = [];
 
       // if (data.auxInfo && data.auxInfo.images) vf_img = await data.auxInfo.images.map((value) => value.samples);
 
@@ -91,7 +97,11 @@ export class Filter {
 
       //2. Adding a Job to the Queue
       //await sendAIQueue.add(filterData, queue_options);
+      this.mineral.addInAIQueue(filterData);
+      console.log('Step-4.5>', ' Data added in queue for mineral deduction ');
+
       this.mineral.sendRequestForClassification(filterData);
+      console.log('Step-4.6>', ' Data sent for deduction ');
 
       return {
         status: true,

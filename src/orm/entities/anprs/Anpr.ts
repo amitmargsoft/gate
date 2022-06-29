@@ -1,5 +1,4 @@
-import moment from 'moment-timezone';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('gate_anpr_data_store')
 export class Anpr {

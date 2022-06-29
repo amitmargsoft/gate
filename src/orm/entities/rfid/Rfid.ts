@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, PrimaryColumn } from 'typeorm';
 
 @Entity('gate_rfid_status')
-export class Anpr {
+export class Rfid {
   @PrimaryGeneratedColumn()
   seq_no: number;
 

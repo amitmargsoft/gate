@@ -1,66 +1,46 @@
 import { Job } from 'bull';
-
-const express = require('express');
+import Queue from 'bull';
 
 import { AxiosRequest } from './AxiosRequest';
+import { SendPackateData } from './SendPackateData';
 
-import { createBullBoard } from 'bull-board';
-
-import Queue from 'bull';
-import { BullAdapter } from 'bull-board/bullAdapter';
-
-const mineralQueue = new Queue('mineralQueue');
-const { router, setQueues } = createBullBoard([new BullAdapter(mineralQueue)]);
-
-const app = express();
-
-app.use('admin/queues', router);
+const mineralQueue = new Queue(process.env.AI_QUEUE_NAME);
+const webDSSQueue = new Queue(process.env.WEB_DSS_QUEUE_NAME);
 
 const { exec } = require('child_process');
-
-
 
 export class MineralDetect {
   public client: any;
   public mineralQueue;
-  public axiosSendRequest;
+  public webDSSQueue;
+  public axiosSendRequest: AxiosRequest;
+  public sendPackateData: SendPackateData;
   constructor() {
     this.mineralQueue = mineralQueue;
+    this.webDSSQueue = webDSSQueue;
     this.axiosSendRequest = new AxiosRequest();
+    this.sendPackateData = new SendPackateData();
   }
 
-  sendRequestForClassification(input: { case_id: any; vf_image_path: any }) {
+  sendRequestForClassification(input) {
     return new Promise((resolve, reject) => {
-      resolve({
-        status: true,
-        data: {
-          case_id: input.case_id,
-          mineral_type: '',
-          mineral_type_confidence: 'X',
-          loaded: false,
-          loaded_confidence: 'X',
-          covered: true,
-          covered_confidence: 'X',
-          overloading: null,
-          overloading_confidence: 0,
-          height: null,
-          mineral_volume: null,
-          mineral_volume_confidence: 0,
-        },
-      });
-
       let vf_img = input.vf_image_path.map((value: string) =>
         value.replace(process.env.SERVER_ANPR_URL, process.env.LOCATION_ANPR_IMAGE_PATH),
       );
 
       vf_img = vf_img.slice(1, -1);
 
-      const data = JSON.stringify({
-        case_id: input.case_id,
-        vf_image_path: vf_img,
-      });
+      // const data = JSON.stringify({
+      //   case_id: input.case_id,
+      //   vf_image_path: [
+      //     'http://122.186.38.58:8201/uncanny/anpr/instance1/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_0.jpg',
+      //     'http://122.186.38.58:8201/uncanny/anpr/instance1/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_1.jpg',
+      //     'http://122.186.38.58:8201/uncanny/anpr/instance1/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_2.jpg',
+      //     'http://122.186.38.58:8201/uncanny/anpr/instance1/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_3.jpg',
+      //   ],
+      // });
 
-      console.log({
+      const data = JSON.stringify({
         case_id: input.case_id,
         vf_image_path: vf_img,
       });
@@ -74,34 +54,34 @@ export class MineralDetect {
         data: data,
       };
 
-      console.log('sending data for AI classification');
-
       this.axiosSendRequest
-        .AxiosRequest(config)
-        .then(function (response: { data: { case_id: any }[] }) {
-          console.log(JSON.stringify(response.data));
-          return;
-          // const ai_resp_data = response.data[0].prediction;
-          // resolve({
-          //   status: true,
-          //   data: {
-          //     case_id: response.data[0].case_id,
-          //     mineral_type: ai_resp_data.mineral_type,
-          //     mineral_type_confidence: ai_resp_data.confidence,
-          //     loaded: ai_resp_data.is_empty == 'False' ? true : false,
-          //     loaded_confidence: ai_resp_data.confidence,
-          //     covered: (ai_resp_data.is_covered = 'False') ? false : true,
-          //     covered_confidence: ai_resp_data.covered_confidence,
-          //     overloading: null,
-          //     overloading_confidence: 0,
-          //     height: null,
-          //     mineral_volume: null,
-          //     mineral_volume_confidence: 0,
-          //   },
-          // });
+        .sendRequest(config)
+        .then(function (response: any) {
+          console.log('Step-4.7.1>', ' Deduction Repsonse find');
+
+          console.log('Response Data ##', response.data);
+          const ai_resp_data = response.data.prediction;
+
+          resolve({
+            status: true,
+            data: {
+              case_id: response.data.case_id,
+              mineral_type: ai_resp_data.mineral_type,
+              mineral_type_confidence: ai_resp_data.confidence,
+              loaded: ai_resp_data.is_empty == 'False' ? true : false,
+              loaded_confidence: ai_resp_data.confidence,
+              covered: (ai_resp_data.is_covered = 'False') ? false : true,
+              covered_confidence: ai_resp_data.covered_confidence,
+              overloading: null,
+              overloading_confidence: 0,
+              height: null,
+              mineral_volume: null,
+              mineral_volume_confidence: 0,
+            },
+          });
         })
-        .catch(function (error: { code: string }) {
-          console.log(error.code);
+        .catch(function (error: any) {
+          console.log('costumerErro', error.message);
           if (error.code === 'ECONNREFUSED') {
             exec(process.env.CMD_SHELL_COMMOND, (error: { message: any }, stdout: any, stderr: any) => {
               if (error) {
@@ -115,7 +95,8 @@ export class MineralDetect {
             });
           }
           setTimeout(() => {
-            reject({
+            console.log('Yes');
+            resolve({
               status: false,
               data: {},
             });
@@ -124,40 +105,74 @@ export class MineralDetect {
     });
   }
 
-  processData() {
+  async processData() {
     this.mineralQueue.process(async (job: Job) => {
       console.log('anpr queue is in progress', {
         case_id: job.data.case_id,
         vf_image_path: job.data.vf_image_path,
       });
 
-      const AiResp = await this.sendRequestForClassification({
+      const AiResp: any = await this.sendRequestForClassification({
         case_id: job.data.case_id,
         vf_image_path: job.data.vf_image_path,
       });
 
-      // if (!AiResp.status) {
-      //   return Promise.reject({
-      //     ...AiResp,
-      //   });
-      // }
-
-      // const filterData = {
-      //   ...job.data,
-      //   ...AiResp.data,
-      // };
-      return new Promise((resolve, rejects) => {
-        return resolve({
-          status: false,
-          message: 'Please try again',
+      if (!AiResp.status) {
+        return Promise.reject({
+          ...AiResp,
         });
+      }
+
+      const filterData = {
+        ...job.data,
+        ...AiResp.data,
+      };
+
+      //1. Job Queue Option
+      const queue_options = {
+        priority: 1,
+        delay: 9000,
+        removeOnComplete: true,
+        backoff: 1000 * 10,
+        attempts: 15,
+        lifo: true,
+      };
+
+      //2. Adding a Job to the Queue
+      await webDSSQueue.add(filterData, queue_options);
+
+      const reqSendStatus = await this.sendPackateData.makeFilterDataPostRequest(filterData);
+      console.log('Step-4.4.1>',' Process added in queue');
+
+      if (reqSendStatus.status) {
+        filterData.retry_flag = false;
+        //insert data in gate_filter_data wit flage false it's mease retry
+        const isUpdated = []; //await Filter.setFilterData(filterData);
+        return Promise.resolve({
+          ...isUpdated,
+        });
+      } else {
+        filterData.retry_flag = true;
+        //insert data in gate_filter_data and pop from queue
+        const isUpdated = []; //await Filter.setFilterData(filterData);
+        return Promise.resolve({
+          ...isUpdated,
+        });
+      }
+    });
+
+    return new Promise((resolve, rejects) => {
+      return resolve({
+        status: false,
+        message: 'Please try again',
       });
     });
   }
 
-  addInQueue(data: any) {
+  addInAIQueue(data: any) {
     this.mineralQueue.add(data, {
       attempts: 5,
+      delay: 9000,
     });
   }
 }

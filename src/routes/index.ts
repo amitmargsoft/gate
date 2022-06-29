@@ -8,7 +8,7 @@ const router = Router();
 
 router.use(`/api/v1`, v1);
 
-router.use(pageRoot);
-router.use(page404);
+// router.use(pageRoot);
+// router.use(page404);
 
 export default router;

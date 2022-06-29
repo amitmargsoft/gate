@@ -1,12 +1,15 @@
-const redis = require('redis');
+import { getRepository } from 'typeorm';
 
-// import { Rfid } from 'orm/entities/rfid/Rfid';
+import { Rfid } from 'orm/entities/rfid/Rfid';
+
+const redis = require('redis');
 
 const REDIS_PORT = process.env.REDIS_PORT || 6379;
 const REDIS_URL = process.env.REDIS_URL || '127.0.0.1';
 
 export class RedisDB {
   public redisdb;
+  public rfid;
   constructor() {
     this.redisdb = redis.createClient(REDIS_PORT);
     this.redisdb.on('error', (err) => {
@@ -16,6 +19,7 @@ export class RedisDB {
     this.redisdb.connect();
 
     this.test();
+    //this.rfid = getRepository(Rfid);
   }
 
   async test() {
@@ -54,6 +58,7 @@ export class RedisDB {
   async deleteData(redisKey, data) {
     return new Promise(async (resolve) => {
       try {
+        console.log('Data Sanitized');
         const availableTags = await this.getData(redisKey);
         if (availableTags) await this.redisdb.set(redisKey, data);
 
@@ -105,33 +110,40 @@ export class RedisDB {
 
         const isRemoved = [];
         const isExist = [];
+
         for (const val of data) {
-          const item = val;
+          const item: any = JSON.parse(val);
 
           const time = Number(item.time);
-          console.log(`rfid => start timestamp : ${start} tag timestamp : ${time} end timestamp : ${end}`);
-          console.log(
-            `rfid => start time : ${new Date(start)} tag time : ${new Date(time)} end time : ${new Date(end)}`,
-          );
-          if (!(start <= time && time <= end)) {
-            isRemoved.push(val.tag);
+          //console.log(`${redisKey} => start timestamp : ${start} tag timestamp : ${time} end timestamp : ${end}`);
+          console.log({ t: time, s: start, e: end, g: item.tag });
+
+          if (!(start <= time && end >= time)) {
+            isRemoved.push(item.tag);
             //const stat = await this.deleteData(redisKey, val);
-           // console.log(`tag removed successfully with status: ${stat} tag: ${JSON.stringify(val)}`);
+            // console.log(`tag removed successfully with status: ${stat} tag: ${JSON.stringify(val)}`);
           } else {
-            isExist.push(val.tag);
+            isExist.push(item.tag);
           }
         }
+        console.log('Loop end data tags filtered success');
 
         const newData = await this.getData(redisKey);
 
         resolve({
           status: true,
           data: newData,
-          all_tag: isExist,
+          all_filter_tag: isExist,
           remove_tag: isRemoved,
         });
       } catch (error) {
-        console.log(error);
+        console.error('Error>', error);
+        resolve({
+          status: false,
+          data: [],
+          all_tag: '',
+          remove_tag: '',
+        });
       }
     });
   }
@@ -157,43 +169,42 @@ export class RedisDB {
       }
     });
   }
-  async getAllRedisTag(mineTagKey, otherTagKey, timestamp) {
+  async getAllRedisTag(mineTagKey, otherTagKey, case_id, timestamp) {
     return new Promise(async (resolve) => {
       try {
-        const mineTags = await this.getData(mineTagKey);
+        const mineTags: any = await this.getData(mineTagKey);
         const otherTags = await this.getData(otherTagKey);
-      
-        const mineFilterTags = await this.filterTags(mineTags, mineTagKey, timestamp);
-        const otherFilterTags = await this.filterTags(otherTags, otherTagKey, timestamp);
 
-        // const mineTags = mineFilterTags.data.map((dat) => dat.tag);
-        // const otherTags = otherFilterTags.data.map((dat) => dat.tag);
+        const mineFilterTags: any = await this.filterTags(mineTags, mineTagKey, timestamp);
+        const otherFilterTags: any = await this.filterTags(otherTags, otherTagKey, timestamp);
 
-        // const allTag = [...mineFilterTags.all_tag, ...otherFilterTags.all_tag];
-        // const removeTag = [...mineFilterTags.remove_tag, ...otherFilterTags.remove_tag];
+        const rawMineTags = mineFilterTags.all_filter_tag.map((dat) => dat);
+        const rawOtherTags = otherFilterTags.data.map((dat) => dat);
 
-        // Rfid.save({
-        //   case_id: case_id,
+        // this.rfid.save({
+        //   // case_id: case_id,
         //   tag_send: allTag.join(', '),
         //   tag_removed: removeTag.join(', '),
         //   inserted_at: new Date(),
         // });
 
-        // const uniqueMineTags = [...new Set(mineTags)];
-        // const uniqueOtherTags = [...new Set(otherTags)];
+        const uniqueMineTags = [...new Set(rawMineTags)];
+        const uniqueOtherTags = [...new Set(rawOtherTags)];
 
-        // const csvMineTags = uniqueMineTags.join(', ');
-        // const csvOtherTags = uniqueOtherTags.join(', ');
+        const csvMineTags = uniqueMineTags.join(', ');
+        const csvOtherTags = uniqueOtherTags.join(', ');
 
         resolve({
           status: true,
-          tag_number: [], //csvMineTags,
-          other_tags: [], //csvOtherTags,
+          tag_number: csvMineTags,
+          other_tags: csvOtherTags,
         });
       } catch (error) {
-        console.log(error);
+        console.log('Error:', error);
         resolve({
           status: false,
+          tag_number: [],
+          other_tags: [],
         });
       }
     });
