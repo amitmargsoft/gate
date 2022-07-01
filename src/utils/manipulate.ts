@@ -1,3 +1,7 @@
+
+import { getRepository } from 'typeorm';
+
+import { Cases } from 'orm/entities/cases/Cases';
 import { RedisDB } from 'utils/redisDB';
 
 import { MineralDetect } from './MineralDetect';
@@ -6,15 +10,18 @@ const randomNum = require('utils/random');
 
 const redisDB = new RedisDB();
 
-export class Filter {
+
+
+export class Manipulate {
   public mineral;
   constructor() {
     this.mineral = new MineralDetect();
     this.mineral.processData();
   }
 
-  async filterAnprData(data) {
+  async manipulateData(data) {
     try {
+
       const rand = await randomNum.getCaseId();
 
       const case_id = process.env.GATE_ID.substring(0, 4) + data.gate_no + rand;
@@ -22,14 +29,13 @@ export class Filter {
       const redisKey1 = `AllMineTags`;
       const redisKey2 = `AllOtherTags`;
 
-      const redisRfidStat: any = await redisDB.getAllRedisTag(redisKey1, redisKey2, case_id, data.event_timestamp);
+      const redisRfidStat: any = await redisDB.getAllRedisTag(redisKey1, redisKey2, data.timestamp);
       console.log('Step-4.2>', ' Filter rf tags');
 
       console.log('log all tags ', redisRfidStat);
 
       const tag = { mine_tags: [], other_tags: [], tag_number: '', vehicle_no: '' };
 
-      console.log('Filter Mine tag by amit', redisRfidStat);
       if (redisRfidStat.status) {
         tag.mine_tags = redisRfidStat.tag_number;
         tag.other_tags = redisRfidStat.other_tags;
@@ -42,49 +48,18 @@ export class Filter {
 
       if (tag.other_tags) isTagRead = 'Y';
 
-      console.log('**** TAG NUMBER ****', tag);
-
-      const filterData = {
+      const manipulatedData = {
+        ...data,
         case_id: case_id,
         gate_id: data.gate_id,
-        timestamp: data.event_timestamp,
         tag_read_flag: isTagRead,
         tag_number: tag.mine_tags ? tag.mine_tags : '',
         other_tag: tag.other_tags ? tag.other_tags : '',
-        vehicle_read_flag: 'Y',
-        vehicle_no: data.reading,
-        vehicle_type_read_flag: 'Y',
-        vehicle_type: data.type,
-        vehicle_height_ft: null,
-        anpr_image_path: data.anpr_image_path,
-        anpr_video_path: data.anpr_video_path,
-        mineral_type: null,
-        loaded: null,
-        height: null,
-        mineral_volume: null,
-        create_date: new Date(),
-        create_by: process.env.GATE_ID,
-        update_date: new Date(),
-        update_by: process.env.GATE_ID,
-        vf_image_path: data.vf_image_path,
-        vf_video_path: data.vf_video_path,
       };
       console.log('Step-4.4>', ' Prepare again data with tags ');
 
-      // if (tag.vehicle_no != 'null' || tag.vehicle_no != null) {
-      //   tag.vehicle_no = 'null';
-      // }
-
-      const vf_img = [];
-
-      // if (data.auxInfo && data.auxInfo.images) vf_img = await data.auxInfo.images.map((value) => value.samples);
-
-      // filterData.vf_image_path = []; //[].concat.apply([], vf_img).map(value => anpr_conf.anpr_url + value.path);
-
-      // let vf_vid = [];
-      // if (data.auxInfo && data.auxInfo.videos) vf_vid = await data.auxInfo.videos.map((value) => value.path);
-
-      // filterData.vf_video_path = [];//[].concat.apply([], vf_vid).map((value) => process.env.SERVER_ANPR_URL + value);
+      const caseDB = getRepository(Cases);
+      await caseDB.save(manipulatedData);
 
       //1. Job Queue Option
       const queue_options = {
@@ -97,10 +72,10 @@ export class Filter {
 
       //2. Adding a Job to the Queue
       //await sendAIQueue.add(filterData, queue_options);
-      this.mineral.addInAIQueue(filterData);
+      this.mineral.addInAIQueue(manipulatedData);
       console.log('Step-4.5>', ' Data added in queue for mineral deduction ');
 
-      //this.mineral.sendRequestForClassification(filterData);
+      //this.mineral.sendRequestForClassification(manipulatedData);
       console.log('Step-4.6>', ' Data sent for deduction ');
 
       return {

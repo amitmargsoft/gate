@@ -101,6 +101,7 @@ export class RedisDB {
   }
 
   async filterTags(data, redisKey, timestamp) {
+
     return new Promise(async (resolve) => {
       try {
         const anprTime = timestamp ? timestamp : Date.now();
@@ -115,8 +116,8 @@ export class RedisDB {
           const item: any = JSON.parse(val);
 
           const time = Number(item.time);
-          //console.log(`${redisKey} => start timestamp : ${start} tag timestamp : ${time} end timestamp : ${end}`);
-          console.log({ t: time, s: start, e: end, g: item.tag });
+          // console.log(`${redisKey} => start timestamp : ${start} tag timestamp : ${time} end timestamp : ${end}`);
+          // console.log({ t: time, s: start, e: end, g: item.tag });
 
           if (!(start <= time && end >= time)) {
             isRemoved.push(item.tag);
@@ -126,8 +127,6 @@ export class RedisDB {
             isExist.push(item.tag);
           }
         }
-        console.log('Loop end data tags filtered success');
-
         const newData = await this.getData(redisKey);
 
         resolve({
@@ -169,7 +168,8 @@ export class RedisDB {
       }
     });
   }
-  async getAllRedisTag(mineTagKey, otherTagKey, case_id, timestamp) {
+  async getAllRedisTag(mineTagKey, otherTagKey, timestamp) {
+
     return new Promise(async (resolve) => {
       try {
         const mineTags: any = await this.getData(mineTagKey);
@@ -180,13 +180,6 @@ export class RedisDB {
 
         const rawMineTags = mineFilterTags.all_filter_tag.map((dat) => dat);
         const rawOtherTags = otherFilterTags.data.map((dat) => dat);
-
-        // this.rfid.save({
-        //   // case_id: case_id,
-        //   tag_send: allTag.join(', '),
-        //   tag_removed: removeTag.join(', '),
-        //   inserted_at: new Date(),
-        // });
 
         const uniqueMineTags = [...new Set(rawMineTags)];
         const uniqueOtherTags = [...new Set(rawOtherTags)];

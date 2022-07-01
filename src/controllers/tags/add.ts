@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { getRepository } from 'typeorm';
 
-import { MineTags } from 'orm/entities/mineTags/MineTags';
+import { Tags } from 'orm/entities/tags/Tags';
 import { RedisDB } from 'utils/redisDB';
 import { CustomError } from 'utils/response/custom-error/CustomError';
 import { TodayDateTime } from 'utils/todayDateTime';
@@ -18,15 +18,14 @@ export const add = async (req: Request, res: Response, next: NextFunction) => {
       timestamp: body.lastSeenTimestampUTC,
       inserted_at: TodayDateTime(),
     };
-
     const redisKey2 = `AllMineTags`;
     const redisKey3 = `AllOtherTags`;
     const redisRfidStat = await redisDB.setRedisTags(redisKey2, redisKey3, data.tid, data.tag_epc, data.timestamp);
     console.log('Setting RFID tags to redis', redisRfidStat);
 
     console.log(data);
-    const mineTags = getRepository(MineTags);
-    await mineTags.save(data);
+    const tagsDB = getRepository(Tags);
+    await tagsDB.save(data);
     console.log('Inserted');
 
     res.customSuccess(200, 'User successfully created.');

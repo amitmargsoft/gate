@@ -11,6 +11,8 @@ export const validatorLogin = (req: Request, res: Response, next: NextFunction) 
   email = !email ? '' : email;
   password = !password ? '' : password;
 
+
+  console.log(validator.isEmail(email))
   if (!validator.isEmail(email)) {
     errorsValidation.push({ email: 'Email is invalid' });
   }

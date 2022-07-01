@@ -1,9 +1,7 @@
 import { Router } from 'express';
 
 import { add, list, show, edit, destroy } from 'controllers/anprs';
-// import { checkJwt } from 'middleware/checkJwt';
-// import { checkRole } from 'middleware/checkRole';
-// import { validatorEdit } from 'middleware/validation/users';
+import { validatorAnpr } from 'middleware/validation/anpr';
 
 const router = Router();
 

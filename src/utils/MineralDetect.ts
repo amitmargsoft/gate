@@ -22,111 +22,88 @@ export class MineralDetect {
     this.sendPackateData = new SendPackateData();
   }
 
-  sendRequestForClassification(input) {
-    return new Promise((resolve, reject) => {
-      let vf_img = input.vf_image_path.map((value: string) =>
-        value.replace(process.env.SERVER_ANPR_URL, process.env.LOCATION_ANPR_IMAGE_PATH),
-      );
+  // sendRequestForClassification(input) {
+  //   return new Promise((resolve, reject) => {
+  //     let vf_img = input.vf_image_path.map((value: string) =>
+  //       value.replace(process.env.SERVER_ANPR_URL, process.env.LOCATION_ANPR_IMAGE_PATH),
+  //     );
 
-      vf_img = vf_img.slice(1, -1);
 
-      // const data = JSON.stringify({
-      //   case_id: input.case_id,
-      //   vf_image_path: [
-      //     'http://122.186.38.58:8201/uncanny/anpr/instance1/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_0.jpg',
-      //     'http://122.186.38.58:8201/uncanny/anpr/instance1/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_1.jpg',
-      //     'http://122.186.38.58:8201/uncanny/anpr/instance1/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_2.jpg',
-      //     'http://122.186.38.58:8201/uncanny/anpr/instance1/report/2022/03/04/imageClips/aux/aux_38167_KA01AB10_8693_3.jpg',
-      //   ],
-      // });
+  //     const data = JSON.stringify({
+  //       case_id: input.case_id,
+  //       vf_image_path: vf_img,
+  //     });
 
-      const data = JSON.stringify({
-        case_id: input.case_id,
-        vf_image_path: vf_img,
-      });
+  //     const config = {
+  //       method: 'post',
+  //       url: process.env.AI_URL,
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       data: data,
+  //     };
 
-      const config = {
-        method: 'post',
-        url: process.env.AI_URL,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        data: data,
-      };
+  //     this.axiosSendRequest
+  //       .sendRequest(config)
+  //       .then(function (response: any) {
+  //         console.log('Step-4.7.1>', ' Deduction Repsonse find');
 
-      this.axiosSendRequest
-        .sendRequest(config)
-        .then(function (response: any) {
-          console.log('Step-4.7.1>', ' Deduction Repsonse find');
+  //         console.log('Response Data ##', response.data);
+  //         const ai_resp_data = response.data.prediction;
 
-          console.log('Response Data ##', response.data);
-          const ai_resp_data = response.data.prediction;
-
-          resolve({
-            status: true,
-            data: {
-              case_id: response.data.case_id,
-              mineral_type: ai_resp_data.mineral_type,
-              mineral_type_confidence: ai_resp_data.confidence,
-              loaded: ai_resp_data.is_empty == 'False' ? true : false,
-              loaded_confidence: ai_resp_data.confidence,
-              covered: (ai_resp_data.is_covered = 'False') ? false : true,
-              covered_confidence: ai_resp_data.covered_confidence,
-              overloading: null,
-              overloading_confidence: 0,
-              height: null,
-              mineral_volume: null,
-              mineral_volume_confidence: 0,
-            },
-          });
-        })
-        .catch(function (error: any) {
-          console.log('costumerErro', error.message);
-          if (error.code === 'ECONNREFUSED') {
-            exec(process.env.CMD_SHELL_COMMOND, (error: { message: any }, stdout: any, stderr: any) => {
-              if (error) {
-                console.log(`error: ${error.message}`);
-                return;
-              }
-              if (stderr) {
-                console.log(`stderr: ${stderr}`);
-                return;
-              }
-            });
-          }
-          setTimeout(() => {
-            console.log('Yes');
-            resolve({
-              status: false,
-              data: {},
-            });
-          }, 3000);
-        });
-    });
-  }
+  //         resolve({
+  //           status: true,
+  //           data: {
+  //             case_id: response.data.case_id,
+  //             mineral_type: ai_resp_data.mineral_type,
+  //             mineral_type_confidence: ai_resp_data.confidence,
+  //             loaded: ai_resp_data.is_empty == 'False' ? true : false,
+  //             loaded_confidence: ai_resp_data.confidence,
+  //             covered: (ai_resp_data.is_covered = 'False') ? false : true,
+  //             covered_confidence: ai_resp_data.covered_confidence,
+  //             overloading: null,
+  //             overloading_confidence: 0,
+  //             height: null,
+  //             mineral_volume: null,
+  //             mineral_volume_confidence: 0,
+  //           },
+  //         });
+  //       })
+  //       .catch(function (error: any) {
+  //         console.log('costumerErro', error.message);
+  //         if (error.code === 'ECONNREFUSED') {
+  //           exec(process.env.CMD_SHELL_COMMOND, (error: { message: any }, stdout: any, stderr: any) => {
+  //             if (error) {
+  //               console.log(`error: ${error.message}`);
+  //               return;
+  //             }
+  //             if (stderr) {
+  //               console.log(`stderr: ${stderr}`);
+  //               return;
+  //             }
+  //           });
+  //         }
+  //         setTimeout(() => {
+  //           console.log('Yes');
+  //           resolve({
+  //             status: false,
+  //             data: {},
+  //           });
+  //         }, 3000);
+  //       });
+  //   });
+  // }
 
   async processData() {
     this.mineralQueue.process(async (job: Job) => {
-      console.log('anpr queue is in progress', {
-        case_id: job.data.case_id,
-        vf_image_path: job.data.vf_image_path,
-      });
 
-      const AiResp: any = await this.sendRequestForClassification({
-        case_id: job.data.case_id,
-        vf_image_path: job.data.vf_image_path,
-      });
+      const filterData = job.data;
 
-      if (!AiResp.status) {
-        return Promise.reject({
-          ...AiResp,
-        });
-      }
+      // const AiResp: any = await this.sendRequestForClassification({
+      //   case_id: job.data.case_id,
+      //   vf_image_path: job.data.vf_image_path,
+      // });
 
-      const filterData = {
-        ...job.data,
-        ...AiResp.data,
-      };
 
       //1. Job Queue Option
       const queue_options = {
@@ -142,7 +119,7 @@ export class MineralDetect {
       await webDSSQueue.add(filterData, queue_options);
 
       const reqSendStatus = await this.sendPackateData.makeFilterDataPostRequest(filterData);
-      console.log('Step-4.4.1>',' Process added in queue');
+      console.log('Step-4.4.1>', ' Process added in queue');
 
       if (reqSendStatus.status) {
         filterData.retry_flag = false;

@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('gate_rfid_data_store')
-export class MineTags {
+export class Tags {
   @PrimaryGeneratedColumn()
   seq_no: number;
 
